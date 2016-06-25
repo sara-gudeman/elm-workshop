@@ -61,7 +61,7 @@ elmHubHeader =
 
 {-| TODO revise this type annotation once we add our onClick handler
 -}
-view : Model -> Html a
+view : Model -> Html Msg
 view model =
     div [ class "content" ]
         [ elmHubHeader
@@ -71,7 +71,7 @@ view model =
 
 {-| TODO revise this type annotation once we add our onClick handler
 -}
-viewSearchResult : SearchResult -> Html a
+viewSearchResult : SearchResult -> Html Msg
 viewSearchResult result =
     li []
         [ span [ class "star-count" ] [ text (toString result.stars) ]
@@ -79,13 +79,19 @@ viewSearchResult result =
             [ text result.name ]
         , button
             -- TODO add an onClick handler that sends a DELETE_BY_ID action
-            [ class "hide-result" ]
+            [ class "hide-result"
+            , onClick
+                { action = "DELETE_BY_ID"
+                , data = result.id
+                }
+            ]
             [ text "X" ]
         ]
 
 
 type alias Msg =
-    { -- TODO implement this type alias
+    { action : String
+    , data : Int
     }
 
 
@@ -93,7 +99,12 @@ update : Msg -> Model -> Model
 update msg model =
     -- TODO if we receive a DELETE_BY_ID message,
     -- build a new model without the given ID present anymore.
-    model
+    if msg.action == "DELETE_BY_ID" then
+        { query = model.query
+        , results = List.filter (\result -> result.id /= msg.data) model.results
+        }
+    else
+        model
 
 
 main : Program Never
